@@ -27,14 +27,21 @@ namespace kinect_04_sensorRGB
         public MainWindow()
         {
             InitializeComponent();
-            InicializarKinect();
+            InicializarSeletor();
         }
 
-        private void InicializarKinect()
+        private void InicializarSeletor()
         {
-            kinect = InicializadorKinect.InicializarPrimeiroSensor(10);
-            kinect.ColorFrameReady += kinect_ColorFrameReady;
+            InicializadorKinect inicializador = new InicializadorKinect();
+            inicializador.MetodoInicializadorKinect = InicializarKinect;
+            seletorSensorUI.KinectSensorChooser = inicializador.SeletorKinect;
+        }
+
+        private void InicializarKinect(KinectSensor kinectSensor)
+        {
+            kinect = kinectSensor;
             kinect.ColorStream.Enable();
+            kinect.ColorFrameReady += kinect_ColorFrameReady;
         }
 
         private BitmapSource ObterImagemSensorRGB(ColorImageFrame quadro)
@@ -63,6 +70,11 @@ namespace kinect_04_sensorRGB
         private void kinect_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             imagemCamera.Source = ObterImagemSensorRGB(e.OpenColorImageFrame());
+        }
+
+        private void slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            kinect.ElevationAngle = Convert.ToInt32(slider.Value);
         }
     }
 }
